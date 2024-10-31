@@ -741,44 +741,38 @@ function updateUserList(users) {
 // Llamar a esta función cuando cargue la página
 document.addEventListener('DOMContentLoaded', fetchUsers);
 async function saveUser() {
-    const userName = document.getElementById('userName').value.trim();
-    const userEmail = document.getElementById('userEmail').value.trim();
+  const userName = document.getElementById('userName').value.trim();
+  const userEmail = document.getElementById('userEmail').value.trim();
 
-    if (userName && userEmail) {
-        try {
-            const response = await fetch('https://script.google.com/macros/s/AKfycbzivNbsABFrrJ9L7oeLV5zu35ZE-ojNCKvknHB6MPMrvl2EGbENdy3OgCPS2Q2IVUmm9g/exec', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    action: 'addUser',
-                    name: userName,
-                    email: userEmail
-                })
-            });
+  if (userName && userEmail) {
+    try {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbwV-hFqpWnUz7n7Q6R-M1Y91k7V1Dv1l03G5StpCUAbZKtxEJe5sFw187CihsMU0141Ig/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          action: 'addUser',
+          name: userName,
+          email: userEmail
+        })
+      });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+      if (!response.ok) {
+        throw new Error(`Error en el servidor: ${response.statusText}`);
+      }
 
-            const result = await response.json(); // Convertimos la respuesta a JSON
-
-            if (result.success) {
-                alert(result.message || 'Usuario añadido con éxito');
-            } else {
-                alert('Hubo un problema al guardar el usuario');
-            }
-
-            fetchUsers();  // Refresca la lista de usuarios después de guardar
-            cancelUserForm(); // Oculta el formulario después de guardar
-        } catch (error) {
-            console.error('Error al guardar usuario:', error);
-            alert('Error al guardar usuario, revisa la consola para más detalles.');
-        }
-    } else {
-        alert("Por favor, completa todos los campos.");
+      const result = await response.json();
+      alert(result.message || "Usuario guardado exitosamente");
+      fetchUsers();
+      cancelUserForm();
+    } catch (error) {
+      console.error('Error al guardar usuario:', error);
+      alert('Error al guardar usuario, revisa la consola para más detalles.');
     }
+  } else {
+    alert("Por favor, completa todos los campos.");
+  }
 }
 
 
