@@ -702,42 +702,52 @@ function updateUserList(users) {
         updateUserList();
 async function fetchUsers() {
    try {
-      const response = await fetch('https://cors-anywhere.herokuapp.com/https://script.google.com/macros/s/AKfycbwV-hFqpWnUz7n7Q6R-M1Y91k7V1Dv1l03G5StpCUAbZKtxEJe5sFw187CihsMU0141Ig/exec?action=getUsers');
+      const response = await fetch('https://script.google.com/macros/s/AKfycbwV-hFqpWnUz7n7Q6R-M1Y91k7V1Dv1l03G5StpCUAbZKtxEJe5sFw187CihsMU0141Ig/exec?action=getUsers', {
+         method: 'GET',
+         headers: {
+            'Content-Type': 'application/json',
+         }
+      });
+
       if (!response.ok) {
-         throw new Error('Network response was not ok');
+         throw new Error(`Error en la red: ${response.status}`);
       }
+
       const result = await response.json();
-      if (result.success) {
+
+      // Verificar si 'result.data' es un array y tiene elementos
+      if (result.success && Array.isArray(result.data)) {
          updateUserList(result.data);
       } else {
-         console.error('Error en la respuesta del servidor:', result.message);
+         console.error('Formato de datos inesperado:', result);
+         alert('Error al cargar los usuarios, revisa el formato de los datos.');
       }
    } catch (error) {
       console.error('Error al obtener usuarios:', error);
+      alert('No se pudo cargar la lista de usuarios. Revisa la consola para más detalles.');
    }
 }
 
-
 function updateUserList(users) {
-  const userList = document.getElementById('userList');
-  userList.innerHTML = '';
+   const userList = document.getElementById('userList');
+   userList.innerHTML = '';
 
-  if (Array.isArray(users)) {
-    users.forEach(user => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${user.name}</td>
-        <td>${user.email}</td>
-        <td>
-          <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
-          <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
-        </td>
-      `;
-      userList.appendChild(row);
-    });
-  } else {
-    console.warn('La respuesta de usuarios no es un array:', users);
-  }
+   if (Array.isArray(users)) {
+      users.forEach(user => {
+         const row = document.createElement('tr');
+         row.innerHTML = `
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>
+               <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
+               <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
+            </td>
+         `;
+         userList.appendChild(row);
+      });
+   } else {
+      console.warn('Los datos de usuarios no están en el formato esperado:', users);
+   }
 }
 
 async function saveUser() {
@@ -746,7 +756,7 @@ async function saveUser() {
 
    if (userName && userEmail) {
       try {
-         const response = await fetch('https://cors-anywhere.herokuapp.com/https://script.google.com/macros/s/AKfycbwV-hFqpWnUz7n7Q6R-M1Y91k7V1Dv1l03G5StpCUAbZKtxEJe5sFw187CihsMU0141Ig/exec', {
+         const response = await fetch('https://script.google.com/macros/s/AKfycbwV-hFqpWnUz7n7Q6R-M1Y91k7V1Dv1l03G5StpCUAbZKtxEJe5sFw187CihsMU0141Ig/exec', {
             method: 'POST',
             headers: {
                'Content-Type': 'application/x-www-form-urlencoded'
@@ -775,8 +785,8 @@ async function saveUser() {
    }
 }
 
-
 document.addEventListener('DOMContentLoaded', fetchUsers);
+
 
 
 
