@@ -473,11 +473,11 @@
             }
         }
 
-function updateUserList(users = []) { // Usa [] como valor predeterminado
+function updateUserList(users = []) {
   const userList = document.getElementById('userList');
   userList.innerHTML = '';
 
-  if (users && users.length > 0) { // Verifica que users esté definido y no esté vacío
+  if (Array.isArray(users) && users.length > 0) { // Verificar si users es un array y tiene elementos
     users.forEach(user => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -491,12 +491,12 @@ function updateUserList(users = []) { // Usa [] como valor predeterminado
       userList.appendChild(row);
     });
   } else {
-    // Opcional: Muestra un mensaje si no hay usuarios
     const row = document.createElement('tr');
     row.innerHTML = `<td colspan="3">No hay usuarios registrados.</td>`;
     userList.appendChild(row);
   }
 }
+
 
 
 
