@@ -702,30 +702,25 @@ function updateUserList(users) {
         updateUserList();
 async function fetchUsers() {
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbwV-hFqpWnUz7n7Q6R-M1Y91k7V1Dv1l03G5StpCUAbZKtxEJe5sFw187CihsMU0141Ig/exec?action=getUsers');
+    const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=getUsers');
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
     const result = await response.json();
-    console.log("Resultado de fetchUsers:", result);
-    updateUserList(result.data); // Asegúrate de que 'data' sea el nombre del array en la respuesta JSON
+    if (result.success) {
+      updateUserList(result.data);
+    } else {
+      console.error('Error en la respuesta del servidor:', result.message);
+    }
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
   }
 }
 
-
-
-
 function updateUserList(users) {
-  if (!Array.isArray(users)) {
-    console.warn('La respuesta de usuarios no es un array:', users);
-    return;
-  }
   const userList = document.getElementById('userList');
   userList.innerHTML = '';
 
-  // Verifica que users esté definido y sea un array
   if (Array.isArray(users)) {
     users.forEach(user => {
       const row = document.createElement('tr');
@@ -744,16 +739,13 @@ function updateUserList(users) {
   }
 }
 
-
-// Llamar a esta función cuando cargue la página
-document.addEventListener('DOMContentLoaded', fetchUsers);
 async function saveUser() {
   const userName = document.getElementById('userName').value.trim();
   const userEmail = document.getElementById('userEmail').value.trim();
 
   if (userName && userEmail) {
     try {
-      const response = await fetch('https://script.google.com/macros/s/AKfycbwV-hFqpWnUz7n7Q6R-M1Y91k7V1Dv1l03G5StpCUAbZKtxEJe5sFw187CihsMU0141Ig/exec', {
+      const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -781,6 +773,9 @@ async function saveUser() {
     alert("Por favor, completa todos los campos.");
   }
 }
+
+document.addEventListener('DOMContentLoaded', fetchUsers);
+
 
 
     </script>
