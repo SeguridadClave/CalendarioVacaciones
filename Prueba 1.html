@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios y Calendarios - ALE-HOP</title>
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+		/* Estilos para todas las secciones */
+		h2 {
+			margin-bottom: 20px; /* Espaciado inferior para todos los títulos h2 */
+		}
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo a {
+            font-size: 1.5em;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid #333;
+            padding: 2px 5px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-left: 20px;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .nav-links a.disabled {
+            color: #ccc;
+            pointer-events: none;
+        }
+
+        .nav-links a:hover:not(.disabled) {
+            color: #4caf50;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Estilos para la sección de Usuarios */
+        #userListSection {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+		
+		
+
+
+        #userListSection button {
+            padding: 10px 15px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        #userListSection button:hover {
+            background-color: #555;
+        }
+
+        /* Tabla de usuarios */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        td:last-child {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .edit-btn {
+            background-color: #ffcc00;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+
+        /* Formulario adicional */
+        #userFormSection {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .save-btn {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: #fff;
+            margin-left: 10px;
+        }
+
+        /* Estilos de calendario */
+        .calendar-container {
+			margin-top: 20px; /* Espaciado superior */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .month {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .month-name {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .day-names, .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .day-names div, .days div {
+            padding: 5px;
+        }
+
+        .day {
+            cursor: pointer;
+            border-radius: 4px;
+            background-color: #fff;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .day:hover {
+            background-color: #e0e0e0;
+        }
+
+        .day.selected {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .day.conflict {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            font-size: 0.8em;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .day:hover .tooltip {
+            display: block;
+        }
+
+        /* Leyenda de usuarios en el calendario de administrador */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        /* Selector de año y usuario */
+        .year-user-select {
+            display: flex; /* Usar flexbox para alinear en una línea */
+            align-items: center; /* Alinear verticalmente */
+            margin-bottom: 20px; /* Espacio entre esta sección y el calendario */
+        }
+
+        .year-select, .user-select {
+            display: flex; /* Mantener la etiqueta y el selector en línea */
+            align-items: center; /* Alinear verticalmente */
+            margin-right: 20px; /* Espacio entre los selectores */
+        }
+
+        .year-select label, .user-select label {
+            margin-right: 5px; /* Espacio entre la etiqueta y el selector */
+        }
+
+        select {
+            width: 160px; /* Ajusta el ancho como sea necesario */
+            padding: 5px; /* Espaciado interno para mejor apariencia */
+            height: 36px; /* Asegúrate de que ambos selectores tengan la misma altura */
+            border: 1px solid #ddd; /* Bordes consistentes */
+            border-radius: 5px; /* Bordes redondeados */
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#"><strong>ALE-HOP</strong></a>
+            </div>
+            <ul class="nav-links">
+                <li><a onclick="showSection('usuarios')" class="nav-item">Usuarios</a></li>
+                <li><a onclick="showSection('calendario')" class="nav-item">Calendario Anual</a></li>
+                <li><a onclick="showSection('admin')" class="nav-item">Administrador</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenido de la página -->
+    <main>
+        <!-- Sección de Usuarios -->
+        <div id="usuarios" class="section">
+            <div id="userListSection">
+                <h2>Usuarios</h2>
+                <button onclick="showUserForm()">Crear Nuevo Usuario</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="userList">
+                    <!-- Aquí se agregarán los usuarios dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulario de Creación/Edición de Usuario -->
+        <div id="userFormSection">
+            <h2 id="formTitle">Crear Usuario</h2>
+            <div class="form-group">
+                <label for="userName">Nombre</label>
+                <input type="text" id="userName" placeholder="Ingresa el nombre del usuario">
+            </div>
+            <div class="form-group">
+                <label for="userEmail">Correo Electrónico</label>
+                <input type="email" id="userEmail" placeholder="Ingresa el correo del usuario">
+            </div>
+            <button class="save-btn" onclick="saveUser()">Guardar</button>
+            <button class="cancel-btn" onclick="cancelUserForm()">Cancelar</button>
+        </div>
+
+        <!-- Sección de Calendario Anual -->
+        <div id="calendario" class="section" style="display:none;">
+            <h2>Calendario Anual</h2>
+            <div class="year-user-select">
+                <div class="year-select">
+                    <label for="calendarYearSelect">Selecciona el Año:</label>
+                    <select id="calendarYearSelect" onchange="generateAnnualCalendar('calendarContainer')">
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                    </select>
+                </div>
+                <div class="user-select">
+                    <label for="userSelect">Selecciona un Usuario:</label>
+                    <select id="userSelect" onchange="changeSelectedUser()">
+                        <!-- Opciones de usuario agregadas dinámicamente -->
+                    </select>
+                </div>
+            </div>
+            <div class="calendar-container" id="calendarContainer">
+                <!-- Calendarios mensuales generados dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Sección de Administrador -->
+        <div id="admin" class="section" style="display:none;">
+            <h2>Panel de Administrador</h2>
+            <div class="year-select">
+                <label for="adminYearSelect">Selecciona el Año:</label>
+                <select id="adminYearSelect" onchange="loadAdminCalendar()">
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+            </div>
+            <div class="calendar-container" id="adminCalendarContainer">
+                <!-- Calendario de administrador generado dinámicamente -->
+            </div>
+            <div class="legend" id="legend">
+                <!-- Leyenda de colores para cada usuario -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let users = [];
+        let userCalendars = {};
+        let selectedUserId = null;
+        let editUserId = null;
+
+        function toggleNavLinks(disable) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(link => {
+                link.classList.toggle("disabled", disable);
+            });
+        }
+
+        function showUserForm(userId = null) {
+            editUserId = userId;
+            toggleNavLinks(true);
+
+            if (userId !== null) {
+                const user = users.find(u => u.id === userId);
+                document.getElementById('formTitle').textContent = 'Editar Usuario';
+                document.getElementById('userName').value = user.name;
+                document.getElementById('userEmail').value = user.email;
+            } else {
+                document.getElementById('formTitle').textContent = 'Crear Usuario';
+                document.getElementById('userName').value = '';
+                document.getElementById('userEmail').value = '';
+            }
+
+            document.getElementById('userFormSection').style.display = 'block';
+            document.getElementById('userListSection').style.display = 'none';
+        }
+
+        function cancelUserForm() {
+            editUserId = null;
+            toggleNavLinks(false);
+            document.getElementById('userFormSection').style.display = 'none';
+            document.getElementById('userListSection').style.display = 'block';
+        }
+
+        function saveUser() {
+            const userName = document.getElementById('userName').value.trim();
+            const userEmail = document.getElementById('userEmail').value.trim();
+
+            if (userName && userEmail) {
+                if (editUserId === null) {
+                    const newUser = {
+                        id: Date.now(),
+                        name: userName,
+                        email: userEmail
+                    };
+                    users.push(newUser);
+                    userCalendars[newUser.id] = new Set();
+                } else {
+                    const user = users.find(u => u.id === editUserId);
+                    user.name = userName;
+                    user.email = userEmail;
+                    editUserId = null;
+                }
+                updateUserSelect();
+                updateUserList();
+                cancelUserForm();
+            } else {
+                alert("Por favor, completa todos los campos.");
+            }
+        }
+
+        function updateUserList() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
+                        <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
+                    </td>
+                `;
+                userList.appendChild(row);
+            });
+        }
+
+        function deleteUser(userId) {
+            users = users.filter(user => user.id !== userId);
+            delete userCalendars[userId];
+            updateUserSelect();
+            updateUserList();
+        }
+
+        function updateUserSelect() {
+            const userSelect = document.getElementById("userSelect");
+            userSelect.innerHTML = '';
+            users.forEach(user => {
+                const option = document.createElement("option");
+                option.value = user.id;
+                option.textContent = user.name;
+                userSelect.appendChild(option);
+            });
+            if (users.length > 0) {
+                selectedUserId = users[0].id;
+                userSelect.value = selectedUserId;
+            }
+            loadUserCalendar();
+        }
+
+        function generateAnnualCalendar(containerId, isAdmin = false) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const selectedYear = document.getElementById(isAdmin ? 'adminYearSelect' : 'calendarYearSelect').value;
+            const months = [
+                { name: "Enero", days: 31 },
+                { name: "Febrero", days: (selectedYear % 4 === 0) ? 29 : 28 },
+                { name: "Marzo", days: 31 },
+                { name: "Abril", days: 30 },
+                { name: "Mayo", days: 31 },
+                { name: "Junio", days: 30 },
+                { name: "Julio", days: 31 },
+                { name: "Agosto", days: 31 },
+                { name: "Septiembre", days: 30 },
+                { name: "Octubre", days: 31 },
+                { name: "Noviembre", days: 30 },
+                { name: "Diciembre", days: 31 },
+            ];
+
+            months.forEach((month, monthIndex) => {
+                const monthDiv = document.createElement("div");
+                monthDiv.classList.add("month");
+
+                const monthName = document.createElement("div");
+                monthName.classList.add("month-name");
+                monthName.textContent = month.name;
+                monthDiv.appendChild(monthName);
+
+                const dayNamesDiv = document.createElement("div");
+                dayNamesDiv.classList.add("day-names");
+                ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].forEach(day => {
+                    const dayName = document.createElement("div");
+                    dayName.textContent = day;
+                    dayNamesDiv.appendChild(dayName);
+                });
+                monthDiv.appendChild(dayNamesDiv);
+
+                const daysDiv = document.createElement("div");
+                daysDiv.classList.add("days");
+
+                const firstDayOffset = new Date(selectedYear, monthIndex, 1).getDay() || 7;
+                for (let i = 1; i < firstDayOffset; i++) {
+                    daysDiv.appendChild(document.createElement("div"));
+                }
+
+                for (let day = 1; day <= month.days; day++) {
+                    const dayElement = document.createElement("div");
+                    dayElement.classList.add("day");
+                    dayElement.textContent = day;
+                    dayElement.onclick = isAdmin ? null : () => toggleDaySelection(monthIndex, day);
+                    daysDiv.appendChild(dayElement);
+                }
+
+                monthDiv.appendChild(daysDiv);
+                container.appendChild(monthDiv);
+            });
+        }
+
+        function toggleDaySelection(monthIndex, day) {
+            if (!selectedUserId) return;
+            const selectedYear = document.getElementById("calendarYearSelect").value;
+            const dayId = `${selectedYear}-${monthIndex}-${day}`;
+            const userCalendar = userCalendars[selectedUserId];
+
+            if (userCalendar.has(dayId)) {
+                userCalendar.delete(dayId);
+            } else {
+                userCalendar.add(dayId);
+            }
+            loadUserCalendar();
+        }
+
+        function loadUserCalendar() {
+            resetCalendar("calendarContainer");
+            const userCalendar = userCalendars[selectedUserId];
+            const selectedYear = document.getElementById("calendarYearSelect").value;
+
+            userCalendar.forEach(dayId => {
+                const [year, monthIndex, day] = dayId.split("-").map(Number);
+                if (year == selectedYear) {
+                    const dayElement = document.querySelector(
+                        `#calendarContainer .month:nth-child(${monthIndex + 1}) .days .day:nth-child(${day + new Date(year, monthIndex, 1).getDay() - 1})`
+                    );
+                    if (dayElement) dayElement.classList.add("selected");
+                }
+            });
+        }
+
+        function resetCalendar(containerId) {
+            document.getElementById(containerId).querySelectorAll(".day").forEach(day => {
+                day.classList.remove("selected", "conflict");
+                const tooltip = day.querySelector(".tooltip");
+                if (tooltip) tooltip.remove();
+            });
+        }
+
+        function loadAdminCalendar() {
+            generateAnnualCalendar("adminCalendarContainer", true);
+            resetCalendar("adminCalendarContainer");
+            const colors = ["#FF5733", "#33FF57", "#3357FF", "#F39C12", "#8E44AD"];
+            const legendContainer = document.getElementById("legend");
+            legendContainer.innerHTML = '';
+
+            const dayConflictMap = new Map();
+            const selectedYear = document.getElementById("adminYearSelect").value;
+
+            users.forEach((user, index) => {
+                const color = colors[index % colors.length];
+                const userCalendar = userCalendars[user.id];
+
+                userCalendar.forEach(dayId => {
+                    const [year, monthIndex, day] = dayId.split("-").map(Number);
+                    if (year == selectedYear) {
+                        const dayKey = `${monthIndex}-${day}`;
+                        if (!dayConflictMap.has(dayKey)) {
+                            dayConflictMap.set(dayKey, []);
+                        }
+                        dayConflictMap.get(dayKey).push(user.name);
+
+                        const dayElement = document.querySelector(
+                            `#adminCalendarContainer .month:nth-child(${monthIndex + 1}) .days .day:nth-child(${day + new Date(year, monthIndex, 1).getDay() - 1})`
+                        );
+                        if (dayElement && dayConflictMap.get(dayKey).length === 1) {
+                            dayElement.style.backgroundColor = color;
+                        }
+                    }
+                });
+            });
+
+            dayConflictMap.forEach((userNames, dayKey) => {
+                const [monthIndex, day] = dayKey.split("-").map(Number);
+                const dayElement = document.querySelector(
+                    `#adminCalendarContainer .month:nth-child(${monthIndex + 1}) .days .day:nth-child(${day + new Date(selectedYear, monthIndex, 1).getDay() - 1})`
+                );
+
+                if (dayElement && userNames.length > 1) {
+                    dayElement.style.backgroundColor = "black"; // Establece el color de fondo en negro
+                    dayElement.classList.add("conflict");
+                    const tooltip = document.createElement("div");
+                    tooltip.className = "tooltip";
+                    tooltip.textContent = "Conflicto entre: " + userNames.join(", ");
+                    dayElement.appendChild(tooltip);
+                }
+            });
+
+            users.forEach((user, index) => {
+                const legendItem = document.createElement("div");
+                legendItem.classList.add("legend-item");
+                const legendColor = document.createElement("div");
+                legendColor.classList.add("legend-color");
+                legendColor.style.backgroundColor = colors[index % colors.length];
+                legendItem.appendChild(legendColor);
+                legendItem.appendChild(document.createTextNode(user.name));
+                legendContainer.appendChild(legendItem);
+            });
+        }
+
+        function changeSelectedUser() {
+            selectedUserId = document.getElementById("userSelect").value;
+            loadUserCalendar();
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+
+            if (sectionId === "admin") {
+                loadAdminCalendar();
+            } else if (sectionId === "calendario") {
+                generateAnnualCalendar("calendarContainer");
+            } else if (sectionId === "usuarios") {
+                document.getElementById('userFormSection').style.display = 'none';
+                document.getElementById('userListSection').style.display = 'block';
+            }
+        }
+
+        updateUserList();
+		async function fetchUsers() {
+  try {
+    const response = await fetch('https://script.google.com/macros/s/tu_api_id/exec?action=getUsers');
+    const users = await response.json();
+    updateUserList(users);
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+  }
+}
+
+function updateUserList(users) {
+  const userList = document.getElementById('userList');
+  userList.innerHTML = '';
+
+  users.forEach(user => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${user.name}</td>
+      <td>${user.email}</td>
+      <td>
+        <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
+        <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
+      </td>
+    `;
+    userList.appendChild(row);
+  });
+}
+
+// Llamar a esta función cuando cargue la página
+document.addEventListener('DOMContentLoaded', fetchUsers);
+async function saveUser() {
+  const userName = document.getElementById('userName').value.trim();
+  const userEmail = document.getElementById('userEmail').value.trim();
+
+  if (userName && userEmail) {
+    try {
+      const response = await fetch('https://script.google.com/macros/s/tu_api_id/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          action: 'addUser',
+          name: userName,
+          email: userEmail
+        })
+      });
+      const result = await response.text();
+      alert(result);
+      fetchUsers();  // Refrescar la lista de usuarios después de guardar
+      cancelUserForm(); // Ocultar el formulario después de guardar
+    } catch (error) {
+      console.error('Error al guardar usuario:', error);
+    }
+  } else {
+    alert("Por favor, completa todos los campos.");
+  }
+}
+
+    </script>
+</body>
+</html>
