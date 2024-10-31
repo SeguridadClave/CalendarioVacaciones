@@ -473,22 +473,32 @@
             }
         }
 
-        function updateUserList() {
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>
-                        <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
-                        <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
-                    </td>
-                `;
-                userList.appendChild(row);
-            });
-        }
+function updateUserList(users = []) { // Usa [] como valor predeterminado
+  const userList = document.getElementById('userList');
+  userList.innerHTML = '';
+
+  // Verifica que users esté definido y no esté vacío
+  if (users && users.length > 0) {
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${user.name}</td>
+        <td>${user.email}</td>
+        <td>
+          <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
+          <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
+        </td>
+      `;
+      userList.appendChild(row);
+    });
+  } else {
+    // Opcional: Muestra un mensaje si no hay usuarios
+    const row = document.createElement('tr');
+    row.innerHTML = `<td colspan="3">No hay usuarios registrados.</td>`;
+    userList.appendChild(row);
+  }
+}
+
 
         function deleteUser(userId) {
             users = users.filter(user => user.id !== userId);
@@ -690,13 +700,14 @@
         }
 
         updateUserList();
-		async function fetchUsers() {
+async function fetchUsers() {
   try {
-    const response = await fetch('https://script.google.com/macros/s/tu_api_id/exec?action=getUsers');
+    const response = await fetch('https://script.google.com/macros/s/AKfycbzivNbsABFrrJ9L7oeLV5zu35ZE-ojNCKvknHB6MPMrvl2EGbENdy3OgCPS2Q2IVUmm9g/exec?action=getUsers');
     const users = await response.json();
     updateUserList(users);
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
+    alert('No se pudo cargar la lista de usuarios.');
   }
 }
 
@@ -726,7 +737,7 @@ async function saveUser() {
 
   if (userName && userEmail) {
     try {
-      const response = await fetch('https://script.google.com/macros/s/tu_api_id/exec', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbzivNbsABFrrJ9L7oeLV5zu35ZE-ojNCKvknHB6MPMrvl2EGbENdy3OgCPS2Q2IVUmm9g/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -737,12 +748,15 @@ async function saveUser() {
           email: userEmail
         })
       });
+
+      // Verifica si la respuesta fue exitosa
       const result = await response.text();
       alert(result);
-      fetchUsers();  // Refrescar la lista de usuarios después de guardar
-      cancelUserForm(); // Ocultar el formulario después de guardar
+      fetchUsers();  // Refresca la lista de usuarios después de guardar
+      cancelUserForm(); // Oculta el formulario después de guardar
     } catch (error) {
       console.error('Error al guardar usuario:', error);
+      alert('Error al guardar usuario, revisa la consola para más detalles.');
     }
   } else {
     alert("Por favor, completa todos los campos.");
