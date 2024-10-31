@@ -707,6 +707,7 @@ async function fetchUsers() {
       throw new Error('Network response was not ok');
     }
     const result = await response.json();
+    console.log(result);  // <-- Esto te permitirá ver la estructura exacta en la consola
     if (result.success) {
       updateUserList(result.data);
     } else {
@@ -716,6 +717,7 @@ async function fetchUsers() {
     console.error('Error al obtener usuarios:', error);
   }
 }
+
 
 
 function updateUserList(users) {
