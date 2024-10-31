@@ -477,8 +477,7 @@ function updateUserList(users = []) { // Usa [] como valor predeterminado
   const userList = document.getElementById('userList');
   userList.innerHTML = '';
 
-  // Verifica que users esté definido y no esté vacío
-  if (users && users.length > 0) {
+  if (users && users.length > 0) { // Verifica que users esté definido y no esté vacío
     users.forEach(user => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -498,6 +497,7 @@ function updateUserList(users = []) { // Usa [] como valor predeterminado
     userList.appendChild(row);
   }
 }
+
 
 
         function deleteUser(userId) {
