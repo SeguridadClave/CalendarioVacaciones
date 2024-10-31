@@ -473,11 +473,11 @@
             }
         }
 
-function updateUserList(users = []) {
+function updateUserList(users) {
   const userList = document.getElementById('userList');
   userList.innerHTML = '';
 
-  if (Array.isArray(users) && users.length > 0) { // Verificar si users es un array y tiene elementos
+  if (Array.isArray(users)) {
     users.forEach(user => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -491,11 +491,10 @@ function updateUserList(users = []) {
       userList.appendChild(row);
     });
   } else {
-    const row = document.createElement('tr');
-    row.innerHTML = `<td colspan="3">No hay usuarios registrados.</td>`;
-    userList.appendChild(row);
+    console.warn('La respuesta de usuarios no es un array:', users);
   }
 }
+
 
 
 
@@ -702,7 +701,7 @@ function updateUserList(users = []) {
         updateUserList();
 async function fetchUsers() {
   try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbzivNbsABFrrJ9L7oeLV5zu35ZE-ojNCKvknHB6MPMrvl2EGbENdy3OgCPS2Q2IVUmm9g/exec?action=getUsers');
+    const response = await fetch('https://script.google.com/macros/s/TU_SCRIPT_ID/exec?action=getUsers');
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -758,7 +757,6 @@ async function saveUser() {
         })
       });
 
-      // Verifica si la respuesta fue exitosa
       const result = await response.text();
       alert(result);
       fetchUsers();  // Refresca la lista de usuarios después de guardar
