@@ -706,8 +706,12 @@ async function fetchUsers() {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    const users = await response.json();
-    updateUserList(users);
+    const result = await response.json();
+    if (result.success) {
+      updateUserList(result.data);
+    } else {
+      console.warn('Error en la respuesta del servidor:', result.message);
+    }
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
   }
@@ -758,14 +762,14 @@ async function saveUser() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`Error en el servidor: ${response.statusText}`);
-      }
-
       const result = await response.json();
-      alert(result.message || "Usuario guardado exitosamente");
-      fetchUsers();
-      cancelUserForm();
+      if (result.success) {
+        alert(result.message || "Usuario guardado exitosamente");
+        fetchUsers();
+        cancelUserForm();
+      } else {
+        alert(`Error: ${result.message}`);
+      }
     } catch (error) {
       console.error('Error al guardar usuario:', error);
       alert('Error al guardar usuario, revisa la consola para más detalles.');
