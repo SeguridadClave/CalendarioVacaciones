@@ -707,7 +707,6 @@ async function fetchUsers() {
     updateUserList(users);
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
-    alert('No se pudo cargar la lista de usuarios.');
   }
 }
 
@@ -715,19 +714,25 @@ function updateUserList(users) {
   const userList = document.getElementById('userList');
   userList.innerHTML = '';
 
-  users.forEach(user => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${user.name}</td>
-      <td>${user.email}</td>
-      <td>
-        <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
-        <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
-      </td>
-    `;
-    userList.appendChild(row);
-  });
+  // Verifica que users esté definido y sea un array
+  if (Array.isArray(users)) {
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${user.name}</td>
+        <td>${user.email}</td>
+        <td>
+          <button class="edit-btn" onclick="showUserForm(${user.id})">Editar</button>
+          <button class="delete-btn" onclick="deleteUser(${user.id})">Borrar</button>
+        </td>
+      `;
+      userList.appendChild(row);
+    });
+  } else {
+    console.warn('La respuesta de usuarios no es un array:', users);
+  }
 }
+
 
 // Llamar a esta función cuando cargue la página
 document.addEventListener('DOMContentLoaded', fetchUsers);
